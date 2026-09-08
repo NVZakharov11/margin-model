@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Модель маржинальности</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F0EDE1;
+    --card:#FAF8EF;
+    --ink:#23281f;
+    --ink-soft:#5b5c50;
+    --line:#D6D0B9;
+    --line-strong:#b9b199;
+    --forest:#33604a;
+    --forest-bg:#E3ECE1;
+    --copper:#a35a2c;
+    --copper-bg:#F4E5D6;
+    --positive:#2c6b42;
+    --positive-bg:#e2ede1;
+    --negative:#a4392f;
+    --negative-bg:#f4e2df;
+    --gold:#93732f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    padding:2.5rem 1.5rem 4rem;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:2rem;
+    padding-bottom:1.25rem;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:2rem;
+    flex-wrap:wrap;
+  }
+  .masthead h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:32px;
+    margin:0 0 .3rem;
+    letter-spacing:-0.01em;
+  }
+  .masthead p{
+    margin:0;
+    color:var(--ink-soft);
+    max-width:46ch;
+    font-size:13.5px;
+  }
+  .masthead .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 400px;
+    gap:2rem;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr;}
+    .summary{position:static !important;}
+  }
+
+  section.block{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:1.4rem 1.5rem 1.6rem;
+    margin-bottom:1.25rem;
+  }
+  section.block.sub{
+    background:transparent;
+    border:none;
+    border-left:2px solid var(--line-strong);
+    padding:0.2rem 0 0.2rem 1.25rem;
+    margin:0.9rem 0 0.9rem;
+  }
+  .block h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:17px;
+    margin:0 0 .15rem;
+  }
+  .block .hint{
+    color:var(--ink-soft);
+    font-size:12.5px;
+    margin:0 0 1.1rem;
+  }
+
+  .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:1rem;
+    padding:.55rem 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .row:last-of-type{border-bottom:none;}
+  .row label{font-size:13.5px;}
+  .row .valwrap{
+    display:flex;
+    align-items:baseline;
+    gap:.35rem;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .row input[type=number]{
+    width:76px;
+    text-align:right;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13.5px;
+    color:var(--ink);
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line-strong);
+    padding:2px 1px;
+  }
+  .row input[type=number]:focus{outline:none;border-bottom:1px solid var(--ink);}
+  .unit{color:var(--ink-soft);font-size:12.5px;}
+
+  .sliderline{margin:.15rem 0 1rem;}
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;
+    height:2px;
+    background:var(--line-strong);
+    border-radius:2px;
+    outline:none;
+    margin:0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--ink);
+    cursor:pointer;
+    border:2px solid var(--card);
+    box-shadow:0 0 0 1px var(--ink);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--ink);cursor:pointer;border:2px solid var(--card);
+    box-shadow:0 0 0 1px var(--ink);
+  }
+  input[type=range].c-forest::-webkit-slider-thumb{background:var(--forest);box-shadow:0 0 0 1px var(--forest);}
+  input[type=range].c-forest::-moz-range-thumb{background:var(--forest);box-shadow:0 0 0 1px var(--forest);}
+  input[type=range].c-copper::-webkit-slider-thumb{background:var(--copper);box-shadow:0 0 0 1px var(--copper);}
+  input[type=range].c-copper::-moz-range-thumb{background:var(--copper);box-shadow:0 0 0 1px var(--copper);}
+
+  .split-bar{
+    display:flex;height:8px;border-radius:4px;overflow:hidden;margin:.3rem 0 1rem;background:var(--line);
+  }
+  .split-bar span{display:block;height:100%;}
+
+  .derived{
+    display:flex;justify-content:space-between;align-items:baseline;
+    background:var(--forest-bg);
+    border-radius:4px;
+    padding:.6rem .9rem;
+    margin-top:.4rem;
+  }
+  .derived.copper{background:var(--copper-bg);}
+  .derived .k{font-size:12.5px;color:var(--ink-soft);}
+  .derived .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14.5px;}
+
+  /* summary panel */
+  .summary{position:sticky;top:1.5rem;}
+  .receipt{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:1.6rem 1.6rem 1.4rem;
+    position:relative;
+  }
+  .receipt::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:-9px;height:9px;
+    background:
+      linear-gradient(135deg,var(--paper) 50%,transparent 0) 0 0/12px 12px,
+      linear-gradient(-135deg,var(--paper) 50%,transparent 0) 0 0/12px 12px;
+    background-repeat:repeat-x;
+  }
+  .hero-label{font-size:12.5px;color:var(--ink-soft);margin:0 0 .2rem;}
+  .hero-value{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:38px;
+    margin:0 0 .1rem;
+    line-height:1.05;
+  }
+  .hero-value.positive{color:var(--positive);}
+  .hero-value.negative{color:var(--negative);}
+  .hero-sub{font-size:12.5px;color:var(--ink-soft);margin:0 0 1.3rem;}
+
+  .rline{
+    display:flex;justify-content:space-between;gap:1rem;
+    padding:.4rem 0;
+    border-bottom:1px dashed var(--line);
+    font-size:13.5px;
+  }
+  .rline.indent{padding-left:1rem;color:var(--ink-soft);font-size:12.5px;}
+  .rline .num{font-family:'IBM Plex Mono',monospace;}
+  .rline.total{
+    border-bottom:none;border-top:2px solid var(--ink);
+    margin-top:.3rem;padding-top:.6rem;
+    font-weight:600;
+  }
+  .rline.total .num{font-size:15px;}
+
+  .gauge{margin:1.4rem 0 .4rem;}
+  .gauge-track{
+    position:relative;height:22px;background:var(--line);border-radius:4px;overflow:hidden;
+  }
+  .gauge-fill{
+    position:absolute;left:0;top:0;bottom:0;
+    background:var(--positive);
+    transition:width .15s ease;
+  }
+  .gauge-fill.deficit{background:var(--negative);}
+  .gauge-mark{
+    position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);
+  }
+  .gauge-mark::after{
+    content:attr(data-label);
+    position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink);white-space:nowrap;
+  }
+  .gauge-legend{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft);margin-top:1.2rem;}
+
+  .verdict{
+    margin-top:1.2rem;padding:.85rem 1rem;border-radius:4px;font-size:13px;
+  }
+  .verdict.positive{background:var(--positive-bg);color:var(--positive);}
+  .verdict.negative{background:var(--negative-bg);color:var(--negative);}
+
+  .pf-block{margin-top:0;}
+  .pf-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:.5rem;}
+  .pf-table th{
+    text-align:right;font-weight:500;color:var(--ink-soft);font-size:11.5px;
+    padding:0 .5rem .5rem;border-bottom:1px solid var(--ink);
+  }
+  .pf-table th:first-child{text-align:left;}
+  .pf-table td{
+    padding:.5rem;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    border-bottom:1px dashed var(--line);vertical-align:middle;
+  }
+  .pf-table td:first-child{text-align:left;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);}
+  .pf-table tr.pf-total td{border-top:2px solid var(--ink);border-bottom:none;font-weight:600;padding-top:.7rem;}
+  .pf-input{
+    width:100%;max-width:150px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--line-strong);padding:2px 1px;
+  }
+  .pf-input:focus{outline:none;border-bottom:1px solid var(--ink);}
+  .pf-table td .num.good{color:var(--positive);font-weight:600;}
+  .pf-table td .num.bad{color:var(--negative);font-weight:600;}
+  #pf_checks_dev.good, #pf_avgCheck_dev.good, #pf_revenue_dev.good, #pf_margin_dev.good, #pf_gross_dev.good, #pf_opex_dev.good, #pf_net_dev.good{color:var(--positive);font-weight:600;}
+  #pf_checks_dev.bad, #pf_avgCheck_dev.bad, #pf_revenue_dev.bad, #pf_margin_dev.bad, #pf_gross_dev.bad, #pf_opex_dev.bad, #pf_net_dev.bad{color:var(--negative);font-weight:600;}
+
+  .mode-toggle{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .mode-option{
+    display:flex;align-items:center;gap:.4rem;
+    border:1px solid var(--line-strong);border-radius:5px;
+    padding:.5rem .8rem;font-size:13px;cursor:pointer;flex:1;min-width:180px;
+  }
+  .mode-option:has(input:checked){background:var(--forest-bg);border-color:var(--forest);}
+  .mode-option input{accent-color:var(--forest);}
+  .row.is-disabled label,.row.is-disabled + .sliderline{opacity:.4;pointer-events:none;}
+  .sliderline.is-disabled{opacity:.4;pointer-events:none;}
+  .row.is-disabled input{color:var(--ink-soft);}
+  .derived.is-disabled{opacity:.55;}
+
+  .tabs{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .tabs-group{display:flex;gap:.4rem;}
+  .reset-btn{
+    font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:500;
+    background:transparent;border:1px solid transparent;color:var(--ink-soft);
+    padding:.5rem .6rem;border-radius:5px;cursor:pointer;
+  }
+  .reset-btn:hover{color:var(--negative);border-color:var(--line-strong);}
+  .tab-btn{
+    font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;
+    background:transparent;border:1px solid var(--line-strong);color:var(--ink-soft);
+    padding:.5rem 1rem;border-radius:5px;cursor:pointer;
+  }
+  .tab-btn.active{background:var(--ink);border-color:var(--ink);color:var(--card);}
+  .tab-btn:not(.active):hover{border-color:var(--ink);color:var(--ink);}
+
+  .param-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .param-table th{
+    text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.5px;
+    padding:0 .5rem .5rem;border-bottom:1px solid var(--ink);
+  }
+  .param-table th:nth-child(2),.param-table th:nth-child(3),.param-table th:nth-child(4){text-align:right;}
+  .param-table td{padding:.5rem;border-bottom:1px dashed var(--line);vertical-align:middle;}
+  .param-table td:nth-child(2),.param-table td:nth-child(3),.param-table td:nth-child(4){text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .param-table td.unit{color:var(--ink-soft);font-size:12.5px;width:2.5rem;}
+  .param-table tr.group-row td{
+    border-bottom:1px solid var(--line-strong);padding:.9rem .5rem .3rem;
+    font-family:'Fraunces',serif;font-size:13px;color:var(--forest);font-weight:500;
+  }
+  .param-table tr.group-row:first-child td{padding-top:.2rem;}
+  .tbl-input,.tbl-fact{
+    width:100px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13.5px;
+    color:var(--ink);background:transparent;border:none;border-bottom:1px solid var(--line-strong);padding:3px 2px;
+  }
+  .tbl-fact{color:var(--ink-soft);}
+  .tbl-fact[readonly]{background:transparent;cursor:default;border-bottom-style:dotted;}
+  .tbl-fact:not(:placeholder-shown){color:var(--ink);}
+  .tbl-input:focus,.tbl-fact:focus{outline:none;border-bottom:1px solid var(--ink);}
+  .tbl-fact[readonly]:focus{border-bottom-style:dotted;}
+  .param-table td.num.good,.pf-table td.num.good{color:var(--positive);font-weight:600;}
+  .param-table td.num.bad,.pf-table td.num.bad{color:var(--negative);font-weight:600;}
+  .param-table tr.ref-row td{border-bottom:none;padding:.3rem .1rem 1rem;}
+  .param-table tr.ref-row .derived{margin:0;}
+
+  .ref-box{background:var(--forest-bg);border-radius:4px;padding:.6rem .9rem .7rem;}
+  .ref-box.copper{background:var(--copper-bg);}
+  .ref-label{font-size:11.5px;color:var(--ink-soft);margin-bottom:.4rem;}
+  .ref-vals{display:flex;gap:1.6rem;flex-wrap:wrap;}
+  .ref-vals > div{display:flex;flex-direction:column;gap:.1rem;}
+  .ref-tag{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+  .ref-vals .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13.5px;color:var(--ink);}
+  .ref-vals .v.num{font-weight:600;}
+  .ref-vals .v.good{color:var(--positive);}
+  .ref-vals .v.bad{color:var(--negative);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>Модель маржинальности</h1>
+      <p>Чек → структура выручки → маржа по сегментам → валовая прибыль → операционные расходы → результат.</p>
+    </div>
+    <div class="tag">регулируйте параметры слева —<br>итог считается справа</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="inputs">
+
+      <div class="tabs">
+        <div class="tabs-group">
+          <button type="button" class="tab-btn active" id="tabBtnSliders" onclick="switchTab('sliders')">Ползунки</button>
+          <button type="button" class="tab-btn" id="tabBtnTable" onclick="switchTab('table')">Таблица параметров</button>
+        </div>
+        <button type="button" class="reset-btn" onclick="resetToDefaults()">↺ Сбросить к умолчаниям</button>
+      </div>
+
+      <div id="view-sliders">
+
+      <section class="block">
+        <h2>Период</h2>
+        <p class="hint">Расчётный период — на нём строится количество чеков и все последующие показатели.</p>
+        <div class="row">
+          <label for="months">Период</label>
+          <div class="valwrap"><input type="number" id="months" value="8" step="1"><span class="unit">мес</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="months_r" min="1" max="24" step="1" value="8"></div>
+      </section>
+
+      <section class="block">
+        <h2>Кол-во чеков</h2>
+        <p class="hint">Выберите, что считать главным источником итогового кол-ва чеков — остальное станет справочным и подсветится серым.</p>
+
+        <div class="mode-toggle">
+          <label class="mode-option">
+            <input type="radio" name="checksSource" id="checksSourceManual" value="manual" checked>
+            <span><strong>Вручную</strong> — вписываю итог сам</span>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="checksSource" id="checksSourceClients" value="clients">
+            <span><strong>От клиентов</strong> — считаю через клиентов и частоту</span>
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="cardSharePct"><strong>Доля чеков по карте</strong> (от общего числа)</label>
+          <div class="valwrap"><input type="number" id="cardSharePct" value="64.8" step="0.1"><span class="unit">%</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="cardSharePct_r" class="c-forest" min="1" max="100" step="0.1" value="64.8"></div>
+
+        <div class="row" id="checksManualRow">
+          <label for="checksManual"><strong>Итого чеков за период</strong></label>
+          <div class="valwrap"><input type="number" id="checksManual" value="1777778" step="1000"><span class="unit">шт</span></div>
+        </div>
+        <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1777778"></div>
+
+        <div class="derived">
+          <span class="k">Чеков по карте</span>
+          <span class="v" id="cardChecksOut">—</span>
+        </div>
+        <div class="derived copper">
+          <span class="k">Чеков без карты</span>
+          <span class="v" id="noCardChecksOut">—</span>
+        </div>
+
+        <div class="row" id="clientsRow" style="border-top:1px dashed var(--line);padding-top:.7rem;">
+          <label for="clients"><strong>Клиенты с картой</strong> — количество</label>
+          <div class="valwrap"><input type="number" id="clients" value="240000" step="1000"><span class="unit">чел</span></div>
+        </div>
+        <div class="sliderline" id="clientsSlider"><input type="range" id="clients_r" min="200" max="1000000" step="1000" value="240000"></div>
+
+        <div class="row" id="freqRow">
+          <label for="freq">Покупок в месяц на клиента с картой</label>
+          <div class="valwrap"><input type="number" id="freq" value="0.6" step="0.1"><span class="unit">шт</span></div>
+        </div>
+        <div class="sliderline" id="freqSlider"><input type="range" id="freq_r" min="0.1" max="10" step="0.1" value="0.6"></div>
+
+        <div class="derived" id="cardChecksModelBox" style="background:var(--card);border:1px dashed var(--line-strong);">
+          <span class="k" id="cardChecksModelLabel">Справочно: чеков по карте по модели клиентов</span>
+          <span class="v" id="cardChecksModelOut">—</span>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Чек</h2>
+        <p class="hint">Средний чек складывается из количества позиций и их средней цены.</p>
+
+        <div class="row">
+          <label for="positions">Шт в чеке</label>
+          <div class="valwrap"><input type="number" id="positions" value="3.61" step="0.01"><span class="unit">шт</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="positions_r" min="1" max="8" step="0.01" value="3.61"></div>
+
+        <div class="row">
+          <label for="price">Средняя цена позиции</label>
+          <div class="valwrap"><input type="number" id="price" value="287.5" step="1"><span class="unit">₽</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="price_r" min="100" max="1500" step="1" value="287.5"></div>
+
+        <div class="derived">
+          <span class="k">Средний чек</span>
+          <span class="v" id="avgCheckOut">—</span>
+        </div>
+        <div class="derived copper">
+          <span class="k">Средняя маржа (справочно, из разделов ниже)</span>
+          <span class="v" id="avgMarginRefOut">—</span>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Структура выручки</h2>
+        <p class="hint">Доля категории «Кормление» (корма) в общей выручке. Остальное — некормовой ассортимент.</p>
+
+        <div class="row">
+          <label for="shareFood">Доля категории «Кормление»</label>
+          <div class="valwrap"><input type="number" id="shareFood" value="56" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="shareFood_r" class="c-forest" min="0" max="100" step="1" value="56"></div>
+
+        <div class="split-bar"><span id="splitFood" style="background:var(--forest);"></span><span id="splitNonFood" style="background:var(--copper);"></span></div>
+        <div class="row" style="border:none;padding-top:0;">
+          <label style="color:var(--forest);">Кормление</label>
+          <span class="valwrap"><span class="unit" id="shareFoodOut">—</span><span class="unit" style="opacity:.6;">· маржа <span id="marginFoodRefOut">—</span></span></span>
+        </div>
+        <div class="row" style="border:none;padding-top:0;">
+          <label style="color:var(--copper);">Некормление</label>
+          <span class="valwrap"><span class="unit" id="shareNonFoodOut">—</span><span class="unit" style="opacity:.6;">· маржа <span id="marginNonFoodRefOut">—</span></span></span>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Кормление — голова и хвост</h2>
+        <p class="hint">«Голова» — три крупнейших бренда по доле выручки внутри кормления, «хвост» — все остальные производители.</p>
+
+        <div class="row">
+          <label for="shareHead">Доля «головы» внутри кормления</label>
+          <div class="valwrap"><input type="number" id="shareHead" value="55" step="1"><span class="unit">%</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="shareHead_r" class="c-forest" min="0" max="100" step="1" value="55"></div>
+        <div class="split-bar"><span id="splitHead" style="background:var(--forest);"></span><span id="splitTail" style="background:#8faa93;"></span></div>
+
+        <section class="block sub">
+          <div class="row">
+            <label for="marginHead">Маржа «головы»</label>
+            <div class="valwrap"><input type="number" id="marginHead" value="27.8" step="0.1"><span class="unit">%</span></div>
+          </div>
+          <div class="sliderline"><input type="range" id="marginHead_r" class="c-forest" min="-5" max="50" step="0.1" value="27.8"></div>
+
+          <div class="row">
+            <label for="marginTail">Маржа «хвоста»</label>
+            <div class="valwrap"><input type="number" id="marginTail" value="39" step="0.1"><span class="unit">%</span></div>
+          </div>
+          <div class="sliderline"><input type="range" id="marginTail_r" class="c-forest" min="-5" max="60" step="0.1" value="39"></div>
+        </section>
+
+        <div class="derived">
+          <span class="k">Средняя маржа кормления</span>
+          <span class="v" id="marginFoodOut">—</span>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Некормление</h2>
+        <p class="hint">Средняя маржа по всему некормовому ассортименту.</p>
+        <div class="row">
+          <label for="marginNonFood">Маржа некормления</label>
+          <div class="valwrap"><input type="number" id="marginNonFood" value="41.7" step="0.1"><span class="unit">%</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="marginNonFood_r" class="c-copper" min="0" max="70" step="0.1" value="41.7"></div>
+      </section>
+
+      <section class="block">
+        <h2>Операционные расходы</h2>
+        <p class="hint">Постоянные расходы за тот же период (аренда, ФОТ, логистика и т.д.).</p>
+        <div class="row">
+          <label for="opex">Операционные расходы</label>
+          <div class="valwrap"><input type="number" id="opex" value="773000000" step="1000000"><span class="unit">₽</span></div>
+        </div>
+        <div class="sliderline"><input type="range" id="opex_r" min="500000" max="1000000000" step="1000000" value="773000000"></div>
+      </section>
+
+      </div>
+
+      <div id="view-table" style="display:none;">
+        <section class="block">
+          <h2>Все параметры одной таблицей</h2>
+          <p class="hint">Столбец «План» — те же регуляторы, что и на вкладке «Ползунки», их можно менять. Столбец «Факт» — зафиксированная база для сравнения, недоступен для редактирования.</p>
+          <table class="param-table">
+            <thead>
+              <tr><th>Параметр</th><th>План</th><th>Факт</th><th>Отклонение</th><th>Ед.</th></tr>
+            </thead>
+            <tbody>
+              <tr class="group-row"><td colspan="5">Период</td></tr>
+              <tr><td>Период</td><td><input type="number" class="tbl-input" data-src="months" value="8" step="1"></td><td><input type="number" class="tbl-fact" data-src="months" value="8" step="1" readonly></td><td class="num" id="dev_months">—</td><td class="unit">мес</td></tr>
+
+              <tr class="group-row"><td colspan="5">Кол-во чеков</td></tr>
+              <tr><td colspan="5" style="padding:.3rem .1rem .8rem;">
+                <div class="mode-toggle" style="margin-bottom:0;">
+                  <label class="mode-option">
+                    <input type="radio" name="checksSourceTbl" id="checksSourceManualTbl" value="manual" checked>
+                    <span><strong>Вручную</strong> — вписываю итог сам</span>
+                  </label>
+                  <label class="mode-option">
+                    <input type="radio" name="checksSourceTbl" id="checksSourceClientsTbl" value="clients">
+                    <span><strong>От клиентов</strong> — считаю через клиентов и частоту</span>
+                  </label>
+                </div>
+              </td></tr>
+              <tr><td>Доля чеков по карте</td><td><input type="number" class="tbl-input" data-src="cardSharePct" value="64.8" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="cardSharePct" value="64.8" step="0.1" readonly></td><td class="num" id="dev_cardSharePct">—</td><td class="unit">%</td></tr>
+              <tr><td>Итого чеков за период</td><td><input type="number" class="tbl-input" data-src="checksManual" value="1777778" step="1000"></td><td><input type="number" class="tbl-fact" data-src="checksManual" value="1777778" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ чеков по карте (итого × доля)</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecks_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_cardChecks_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_cardChecks_dev">—</span></div>
+              </div></div></td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box copper"><div class="ref-label">→ чеков без карты (итого × доля)</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_noCardChecks_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_noCardChecks_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_noCardChecks_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr><td>Клиенты с картой — количество <span style="opacity:.6;">(справочно)</span></td><td><input type="number" class="tbl-input" data-src="clients" value="240000" step="1000"></td><td><input type="number" class="tbl-fact" data-src="clients" value="240000" step="1000" readonly></td><td class="num" id="dev_clients">—</td><td class="unit">чел</td></tr>
+              <tr><td>Покупок в месяц на клиента с картой <span style="opacity:.6;">(справочно)</span></td><td><input type="number" class="tbl-input" data-src="freq" value="0.6" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="freq" value="0.6" step="0.1" readonly></td><td class="num" id="dev_freq">—</td><td class="unit">шт</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box" style="background:transparent;border:1px dashed var(--line-strong);"><div class="ref-label">→ справочно: чеков по карте по модели клиентов</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecksModel_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_cardChecksModel_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_cardChecksModel_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr class="group-row"><td colspan="5">Чек</td></tr>
+              <tr><td>Шт в чеке</td><td><input type="number" class="tbl-input" data-src="positions" value="3.61" step="0.01"></td><td><input type="number" class="tbl-fact" data-src="positions" value="3.61" step="0.01" readonly></td><td class="num" id="dev_positions">—</td><td class="unit">шт</td></tr>
+              <tr><td>Средняя цена позиции</td><td><input type="number" class="tbl-input" data-src="price" value="287.5" step="1"></td><td><input type="number" class="tbl-fact" data-src="price" value="287.5" step="1" readonly></td><td class="num" id="dev_price">—</td><td class="unit">₽</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ средний чек</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_avgCheck_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_avgCheck_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_avgCheck_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr class="group-row"><td colspan="5">Структура выручки</td></tr>
+              <tr><td>Доля категории «Кормление»</td><td><input type="number" class="tbl-input" data-src="shareFood" value="56" step="1"></td><td><input type="number" class="tbl-fact" data-src="shareFood" value="56" step="1" readonly></td><td class="num" id="dev_shareFood">—</td><td class="unit">%</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ выручка кормления</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_revFood_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_revFood_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_revFood_dev">—</span></div>
+              </div></div></td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box copper"><div class="ref-label">→ выручка некормления</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_revNonFood_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_revNonFood_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_revNonFood_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr class="group-row"><td colspan="5">Кормление — голова и хвост</td></tr>
+              <tr><td>Доля «головы» внутри кормления</td><td><input type="number" class="tbl-input" data-src="shareHead" value="55" step="1"></td><td><input type="number" class="tbl-fact" data-src="shareHead" value="55" step="1" readonly></td><td class="num" id="dev_shareHead">—</td><td class="unit">%</td></tr>
+              <tr><td>Маржа «головы»</td><td><input type="number" class="tbl-input" data-src="marginHead" value="27.8" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="marginHead" value="27.8" step="0.1" readonly></td><td class="num" id="dev_marginHead">—</td><td class="unit">%</td></tr>
+              <tr><td>Маржа «хвоста»</td><td><input type="number" class="tbl-input" data-src="marginTail" value="39" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="marginTail" value="39" step="0.1" readonly></td><td class="num" id="dev_marginTail">—</td><td class="unit">%</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ средняя маржа кормления</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_marginFood_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_marginFood_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_marginFood_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr class="group-row"><td colspan="5">Некормление</td></tr>
+              <tr><td>Маржа некормления</td><td><input type="number" class="tbl-input" data-src="marginNonFood" value="41.7" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="marginNonFood" value="41.7" step="0.1" readonly></td><td class="num" id="dev_marginNonFood">—</td><td class="unit">%</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box copper"><div class="ref-label">→ валовая прибыль от некормления</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_grossNonFood_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_grossNonFood_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_grossNonFood_dev">—</span></div>
+              </div></div></td></tr>
+
+              <tr class="group-row"><td colspan="5">Операционные расходы</td></tr>
+              <tr><td>Операционные расходы</td><td><input type="number" class="tbl-input" data-src="opex" value="773000000" step="1000000"></td><td><input type="number" class="tbl-fact" data-src="opex" value="773000000" step="1000000" readonly></td><td class="num" id="dev_opex">—</td><td class="unit">₽</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box" id="tblref_netBox"><div class="ref-label">→ чистая прибыль за период (итог модели)</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_net_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_net_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_net_dev">—</span></div>
+              </div></div></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="block">
+          <h2>Результат по факту</h2>
+          <p class="hint">Считается автоматически из фактических значений выше. Если факт по параметру не введён, используется плановое значение.</p>
+          <table class="pf-table">
+            <thead>
+              <tr><th>Показатель</th><th>План</th><th>Факт (расчёт)</th><th>Отклонение</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Кол-во чеков</td><td class="num" id="res_checks_plan">—</td><td class="num" id="res_checks_fact">—</td><td class="num" id="res_checks_dev">—</td></tr>
+              <tr><td>Средний чек</td><td class="num" id="res_avgCheck_plan">—</td><td class="num" id="res_avgCheck_fact">—</td><td class="num" id="res_avgCheck_dev">—</td></tr>
+              <tr><td>Выручка</td><td class="num" id="res_revenue_plan">—</td><td class="num" id="res_revenue_fact">—</td><td class="num" id="res_revenue_dev">—</td></tr>
+              <tr><td>Средняя маржа</td><td class="num" id="res_margin_plan">—</td><td class="num" id="res_margin_fact">—</td><td class="num" id="res_margin_dev">—</td></tr>
+              <tr><td>Валовая прибыль</td><td class="num" id="res_gross_plan">—</td><td class="num" id="res_gross_fact">—</td><td class="num" id="res_gross_dev">—</td></tr>
+              <tr><td>Операционные расходы</td><td class="num" id="res_opex_plan">—</td><td class="num" id="res_opex_fact">—</td><td class="num" id="res_opex_dev">—</td></tr>
+              <tr class="pf-total"><td>Чистая прибыль</td><td class="num" id="res_net_plan">—</td><td class="num" id="res_net_fact">—</td><td class="num" id="res_net_dev">—</td></tr>
+              <tr><td>Среднемесячная чистая прибыль</td><td class="num" id="res_netMonthly_plan">—</td><td class="num" id="res_netMonthly_fact">—</td><td class="num" id="res_netMonthly_dev">—</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+    </div>
+
+
+    <div class="summary" id="summaryPanel">
+      <div class="receipt">
+        <p class="hero-label">Чистая прибыль за период</p>
+        <p class="hero-value" id="netValue">—</p>
+        <p class="hero-sub" id="netSub">—</p>
+
+        <div class="rline"><span>Количество чеков</span><span class="num" id="r_checks">—</span></div>
+        <div class="rline indent"><span>клиентов × покупок/мес × период</span><span class="num" id="r_clientsFreq">—</span></div>
+        <div class="rline indent"><span>позиций в чеке / цена позиции</span><span class="num" id="r_posPrice">—</span></div>
+        <div class="rline"><span>Средний чек</span><span class="num" id="r_avgCheck">—</span></div>
+        <div class="rline"><span>Доля кормление / некормление</span><span class="num" id="r_shareFood">—</span></div>
+        <div class="rline indent"><span>маржа кормления (голова / хвост)</span><span class="num" id="r_marginFoodDetail">—</span></div>
+        <div class="rline indent"><span>маржа некормления</span><span class="num" id="r_marginNonFood">—</span></div>
+        <div class="rline"><span>Средняя маржа</span><span class="num" id="r_avgMargin">—</span></div>
+        <div class="rline"><span>Операционные расходы</span><span class="num" id="r_opex">—</span></div>
+
+        <div class="rline total"><span>Выручка</span><span class="num" id="r_revenue">—</span></div>
+        <div class="rline total"><span>Валовая прибыль</span><span class="num" id="r_gross">—</span></div>
+        <div class="rline total"><span>Чистая прибыль</span><span class="num" id="r_net">—</span></div>
+
+        <div class="gauge">
+          <div class="gauge-track">
+            <div class="gauge-fill" id="gaugeFill"></div>
+            <div class="gauge-mark" id="gaugeMark"></div>
+          </div>
+          <div class="gauge-legend"><span>0% маржи</span><span>маржа, покрывающая выручку</span></div>
+        </div>
+
+        <div class="verdict" id="verdict">—</div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="block pf-block" id="outerPfBlock">
+    <h2>План / факт / отклонение</h2>
+    <p class="hint">Слева — план, рассчитанный моделью по ползункам выше. Впишите фактические цифры за период — отклонение и цвет посчитаются сами.</p>
+    <table class="pf-table">
+      <thead>
+        <tr><th>Показатель</th><th>План</th><th>Факт</th><th>Отклонение</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Кол-во чеков</td>
+          <td class="num" id="pf_checks_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_checks_fact" placeholder="—"></td>
+          <td class="num" id="pf_checks_dev">—</td>
+        </tr>
+        <tr>
+          <td>Средний чек</td>
+          <td class="num" id="pf_avgCheck_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_avgCheck_fact" placeholder="—"></td>
+          <td class="num" id="pf_avgCheck_dev">—</td>
+        </tr>
+        <tr>
+          <td>Выручка</td>
+          <td class="num" id="pf_revenue_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_revenue_fact" placeholder="—"></td>
+          <td class="num" id="pf_revenue_dev">—</td>
+        </tr>
+        <tr>
+          <td>Средняя маржа</td>
+          <td class="num" id="pf_margin_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_margin_fact" placeholder="—"></td>
+          <td class="num" id="pf_margin_dev">—</td>
+        </tr>
+        <tr>
+          <td>Валовая прибыль</td>
+          <td class="num" id="pf_gross_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_gross_fact" placeholder="—"></td>
+          <td class="num" id="pf_gross_dev">—</td>
+        </tr>
+        <tr>
+          <td>Операционные расходы</td>
+          <td class="num" id="pf_opex_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_opex_fact" placeholder="—"></td>
+          <td class="num" id="pf_opex_dev">—</td>
+        </tr>
+        <tr class="pf-total">
+          <td>Чистая прибыль</td>
+          <td class="num" id="pf_net_plan">—</td>
+          <td><input type="number" class="pf-input" id="pf_net_fact" placeholder="—"></td>
+          <td class="num" id="pf_net_dev">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+function fmtRub(n){
+  return Math.round(n).toLocaleString('ru-RU') + ' ₽';
+}
+function fmtPct(n){
+  return n.toFixed(1).replace('.', ',') + '%';
+}
+function fmtPP(n){
+  const sign = n > 0 ? '+' : '';
+  return sign + n.toFixed(1).replace('.', ',') + ' п.п.';
+}
+
+function link(rangeId, numberId, min, max, cb){
+  const r = document.getElementById(rangeId);
+  const n = document.getElementById(numberId);
+  function clamp(v){ return Math.min(max, Math.max(min, v)); }
+  r.addEventListener('input', () => { n.value = r.value; cb(); });
+  n.addEventListener('input', () => {
+    let v = parseFloat(n.value);
+    if(isNaN(v)) return;
+    v = clamp(v);
+    r.value = v;
+    cb();
+  });
+}
+
+function updateChecksSourceUI(mode){
+  const manualRow = document.getElementById('checksManualRow');
+  const manualSlider = document.getElementById('checksManualSlider');
+  const clientsRow = document.getElementById('clientsRow');
+  const clientsSlider = document.getElementById('clientsSlider');
+  const freqRow = document.getElementById('freqRow');
+  const freqSlider = document.getElementById('freqSlider');
+  const modelBox = document.getElementById('cardChecksModelBox');
+  const checksManualInput = document.getElementById('checksManual');
+  const checksManualRange = document.getElementById('checksManual_r');
+  const clientsInput = document.getElementById('clients');
+  const clientsRange = document.getElementById('clients_r');
+  const freqInput = document.getElementById('freq');
+  const freqRange = document.getElementById('freq_r');
+  const tblManual = document.querySelectorAll('.tbl-input[data-src="checksManual"]');
+  const tblClients = document.querySelectorAll('.tbl-input[data-src="clients"]');
+  const tblFreq = document.querySelectorAll('.tbl-input[data-src="freq"]');
+
+  const isManual = mode === 'manual';
+
+  // Синхронизируем оба набора переключателей (ползунки и таблица параметров) между собой
+  document.getElementById('checksSourceManual').checked = isManual;
+  document.getElementById('checksSourceClients').checked = !isManual;
+  document.getElementById('checksSourceManualTbl').checked = isManual;
+  document.getElementById('checksSourceClientsTbl').checked = !isManual;
+
+  manualRow.classList.toggle('is-disabled', !isManual);
+  manualSlider.classList.toggle('is-disabled', !isManual);
+  checksManualInput.disabled = !isManual;
+  checksManualRange.disabled = !isManual;
+  tblManual.forEach(el => el.disabled = !isManual);
+
+  clientsRow.classList.toggle('is-disabled', isManual);
+  clientsSlider.classList.toggle('is-disabled', isManual);
+  freqRow.classList.toggle('is-disabled', isManual);
+  freqSlider.classList.toggle('is-disabled', isManual);
+  clientsInput.disabled = isManual;
+  clientsRange.disabled = isManual;
+  freqInput.disabled = isManual;
+  freqRange.disabled = isManual;
+  tblClients.forEach(el => el.disabled = isManual);
+  tblFreq.forEach(el => el.disabled = isManual);
+
+  modelBox.classList.toggle('is-disabled', isManual);
+  document.getElementById('cardChecksModelLabel').textContent = isManual
+    ? 'Справочно: чеков по карте по модели клиентов'
+    : 'Чеков по карте (по модели клиентов) — используется в расчёте';
+}
+
+function recalc(){
+  const clients = parseFloat(document.getElementById('clients').value) || 0;
+  const freq = parseFloat(document.getElementById('freq').value) || 0;
+  const months = parseFloat(document.getElementById('months').value) || 0;
+  const cardSharePct = parseFloat(document.getElementById('cardSharePct').value) || 0;
+  const cardChecksModel = clients * freq * months;
+  const checksSource = document.querySelector('input[name="checksSource"]:checked').value;
+
+  let checks, cardChecks;
+  if (checksSource === 'manual') {
+    checks = parseFloat(document.getElementById('checksManual').value) || 0;
+    cardChecks = checks * (cardSharePct / 100);
+  } else {
+    cardChecks = cardChecksModel;
+    checks = cardSharePct > 0 ? cardChecks / (cardSharePct / 100) : cardChecks;
+    document.getElementById('checksManual').value = Math.round(checks);
+    document.getElementById('checksManual_r').value = checks;
+  }
+  const noCardChecks = checks - cardChecks;
+  updateChecksSourceUI(checksSource);
+
+  const positions = parseFloat(document.getElementById('positions').value) || 0;
+  const price = parseFloat(document.getElementById('price').value) || 0;
+  const shareFood = parseFloat(document.getElementById('shareFood').value) || 0;
+  const shareHead = parseFloat(document.getElementById('shareHead').value) || 0;
+
+  let marginHead, marginTail, marginNonFood;
+  if (price !== lastPriceForMargin) {
+    // Цена изменилась — держим себестоимость фиксированной, маржа пересчитывается
+    marginHead = price > 0 ? ((price - costState.head) / price) * 100 : 0;
+    marginTail = price > 0 ? ((price - costState.tail) / price) * 100 : 0;
+    marginNonFood = price > 0 ? ((price - costState.nonFood) / price) * 100 : 0;
+    document.getElementById('marginHead').value = marginHead.toFixed(1);
+    document.getElementById('marginHead_r').value = marginHead;
+    document.getElementById('marginTail').value = marginTail.toFixed(1);
+    document.getElementById('marginTail_r').value = marginTail;
+    document.getElementById('marginNonFood').value = marginNonFood.toFixed(1);
+    document.getElementById('marginNonFood_r').value = marginNonFood;
+  } else {
+    // Маржу задали/поменяли напрямую — обновляем неявную себестоимость под неё
+    marginHead = parseFloat(document.getElementById('marginHead').value) || 0;
+    marginTail = parseFloat(document.getElementById('marginTail').value) || 0;
+    marginNonFood = parseFloat(document.getElementById('marginNonFood').value) || 0;
+    costState.head = price * (1 - marginHead / 100);
+    costState.tail = price * (1 - marginTail / 100);
+    costState.nonFood = price * (1 - marginNonFood / 100);
+  }
+  lastPriceForMargin = price;
+
+  const opex = parseFloat(document.getElementById('opex').value) || 0;
+
+  const shareNonFood = 100 - shareFood;
+  const shareTail = 100 - shareHead;
+
+  const avgCheck = positions * price;
+  const revenue = checks * avgCheck;
+  const revFood = revenue * shareFood / 100;
+  const revNonFood = revenue * shareNonFood / 100;
+  const revHead = revFood * shareHead / 100;
+  const revTail = revFood * shareTail / 100;
+
+  const marginFoodAvg = shareFood > 0 ? (marginHead * shareHead + marginTail * shareTail) / 100 : 0;
+
+  const grossFood = revHead * marginHead/100 + revTail * marginTail/100;
+  const grossNonFood = revNonFood * marginNonFood/100;
+  const gross = grossFood + grossNonFood;
+  const avgMargin = revenue > 0 ? (gross / revenue) * 100 : 0;
+
+  const net = gross - opex;
+  const breakEvenMargin = revenue > 0 ? (opex / revenue) * 100 : 0;
+  const gapPP = avgMargin - breakEvenMargin;
+
+  document.getElementById('cardChecksOut').textContent = Math.round(cardChecks).toLocaleString('ru-RU') + ' шт';
+  document.getElementById('noCardChecksOut').textContent = Math.round(noCardChecks).toLocaleString('ru-RU') + ' шт';
+  document.getElementById('cardChecksModelOut').textContent = Math.round(cardChecksModel).toLocaleString('ru-RU') + ' шт';
+  document.getElementById('avgCheckOut').textContent = fmtRub(avgCheck);
+  document.getElementById('avgMarginRefOut').textContent = fmtPct(avgMargin);
+  document.getElementById('shareFoodOut').textContent = fmtPct(shareFood);
+  document.getElementById('shareNonFoodOut').textContent = fmtPct(shareNonFood);
+  document.getElementById('marginFoodRefOut').textContent = fmtPct(marginFoodAvg);
+  document.getElementById('marginNonFoodRefOut').textContent = fmtPct(marginNonFood);
+  document.getElementById('splitFood').style.width = shareFood + '%';
+  document.getElementById('splitNonFood').style.width = shareNonFood + '%';
+  document.getElementById('splitHead').style.width = shareHead + '%';
+  document.getElementById('splitTail').style.width = shareTail + '%';
+  document.getElementById('marginFoodOut').textContent = fmtPct(marginFoodAvg);
+
+  document.getElementById('r_checks').textContent = Math.round(checks).toLocaleString('ru-RU') + ' шт';
+  document.getElementById('r_clientsFreq').textContent = Math.round(clients).toLocaleString('ru-RU') + ' × ' + freq.toFixed(1).replace('.',',') + ' × ' + months.toFixed(0) + ' мес';
+  document.getElementById('r_posPrice').textContent = positions.toFixed(1).replace('.', ',') + ' шт · ' + fmtRub(price);
+  document.getElementById('r_avgCheck').textContent = fmtRub(avgCheck);
+  document.getElementById('r_shareFood').textContent = fmtPct(shareFood) + ' / ' + fmtPct(shareNonFood);
+  document.getElementById('r_marginFoodDetail').textContent = fmtPct(marginHead) + ' / ' + fmtPct(marginTail);
+  document.getElementById('r_marginNonFood').textContent = fmtPct(marginNonFood);
+  document.getElementById('r_avgMargin').textContent = fmtPct(avgMargin);
+  document.getElementById('r_opex').textContent = fmtRub(opex);
+  document.getElementById('r_revenue').textContent = fmtRub(revenue);
+  document.getElementById('r_gross').textContent = fmtRub(gross);
+  document.getElementById('r_net').textContent = (net >= 0 ? '' : '– ') + fmtRub(Math.abs(net));
+
+  const heroEl = document.getElementById('netValue');
+  heroEl.textContent = (net >= 0 ? '+' : '–') + fmtRub(Math.abs(net));
+  heroEl.className = 'hero-value ' + (net >= 0 ? 'positive' : 'negative');
+
+  document.getElementById('netSub').textContent =
+    'Текущая маржа ' + fmtPct(avgMargin) + ' · нужна для безубытка ' + fmtPct(Math.max(0,breakEvenMargin)) + ' (' + fmtPP(gapPP) + ')';
+
+  const fillPct = Math.max(0, Math.min(100, avgMargin));
+  const fill = document.getElementById('gaugeFill');
+  fill.style.width = fillPct + '%';
+  fill.className = 'gauge-fill' + (net >= 0 ? '' : ' deficit');
+
+  const markPct = Math.max(0, Math.min(100, breakEvenMargin));
+  const mark = document.getElementById('gaugeMark');
+  mark.style.left = markPct + '%';
+  mark.setAttribute('data-label', fmtPct(breakEvenMargin));
+
+  const verdict = document.getElementById('verdict');
+  if(net >= 0){
+    verdict.className = 'verdict positive';
+    verdict.textContent = 'Маржа перекрывает операционные расходы: запас ' + fmtPP(gapPP) + ' сверх точки безубыточности, чистая прибыль ' + fmtRub(net) + '.';
+  } else {
+    verdict.className = 'verdict negative';
+    verdict.textContent = 'Маржи не хватает на ' + fmtPP(Math.abs(gapPP)).replace('+','') + ' до точки безубыточности, убыток ' + fmtRub(Math.abs(net)) + '.';
+  }
+
+  updatePF({
+    checks:  {plan: checks,    fmt: v => Math.round(v).toLocaleString('ru-RU') + ' шт'},
+    avgCheck:{plan: avgCheck,  fmt: fmtRub},
+    revenue: {plan: revenue,   fmt: fmtRub},
+    margin:  {plan: avgMargin, fmt: fmtPct, isPP:true},
+    gross:   {plan: gross,     fmt: fmtRub},
+    opex:    {plan: opex,      fmt: fmtRub, invert:true},
+    net:     {plan: net,       fmt: fmtRub}
+  });
+
+  document.querySelectorAll('.tbl-input').forEach(el => {
+    if(document.activeElement === el) return;
+    const src = document.getElementById(el.dataset.src);
+    if(src) el.value = src.value;
+  });
+
+  const planVals = {cardSharePct,checksManual:checks,clients,freq,months,positions,price,shareFood,shareHead,marginHead,marginTail,marginNonFood,opex};
+  const factResult = updateParamFacts(planVals);
+  const factVals = factResult.vals;
+  const anyFact = factResult.any;
+  const factScenario = computeScenario(factVals);
+
+  fillRefRow('res_', 'checks', checks, factScenario.checks, anyFact, v => Math.round(v).toLocaleString('ru-RU') + ' шт');
+  fillRefRow('res_', 'avgCheck', avgCheck, factScenario.avgCheck, anyFact, fmtRub);
+  fillRefRow('res_', 'revenue', revenue, factScenario.revenue, anyFact, fmtRub);
+  fillRefRow('res_', 'margin', avgMargin, factScenario.avgMargin, anyFact, fmtPct, true);
+  fillRefRow('res_', 'gross', gross, factScenario.gross, anyFact, fmtRub);
+  fillRefRow('res_', 'opex', opex, factScenario.opex, anyFact, fmtRub, false, true);
+  fillRefRow('res_', 'net', net, factScenario.net, anyFact, fmtRub);
+
+  const netMonthlyPlan = months > 0 ? net / months : 0;
+  const netMonthlyFact = factVals.months > 0 ? factScenario.net / factVals.months : 0;
+  fillRefRow('res_', 'netMonthly', netMonthlyPlan, netMonthlyFact, anyFact, fmtRub);
+
+  fillRefRow('tblref_', 'cardChecks', cardChecks, factScenario.cardChecks, anyFact, v => Math.round(v).toLocaleString('ru-RU') + ' шт');
+  fillRefRow('tblref_', 'noCardChecks', noCardChecks, factScenario.noCardChecks, anyFact, v => Math.round(v).toLocaleString('ru-RU') + ' шт');
+  fillRefRow('tblref_', 'cardChecksModel', cardChecksModel, factScenario.cardChecksModel, anyFact, v => Math.round(v).toLocaleString('ru-RU') + ' шт');
+  fillRefRow('tblref_', 'avgCheck', avgCheck, factScenario.avgCheck, anyFact, fmtRub);
+  fillRefRow('tblref_', 'revFood', revFood, factScenario.revFood, anyFact, fmtRub);
+  fillRefRow('tblref_', 'revNonFood', revNonFood, factScenario.revNonFood, anyFact, fmtRub);
+  fillRefRow('tblref_', 'marginFood', marginFoodAvg, factScenario.marginFoodAvg, anyFact, fmtPct, true);
+  fillRefRow('tblref_', 'grossNonFood', grossNonFood, factScenario.grossNonFood, anyFact, fmtRub);
+  fillRefRow('tblref_', 'net', net, factScenario.net, anyFact, fmtRub);
+  document.getElementById('tblref_netBox').style.background = net >= 0 ? 'var(--positive-bg)' : 'var(--negative-bg)';
+}
+
+function computeScenario(v){
+  const shareNonFood = 100 - v.shareFood;
+  const shareTail = 100 - v.shareHead;
+  const checks = v.checksManual;
+  const cardChecks = checks * (v.cardSharePct / 100);
+  const noCardChecks = checks - cardChecks;
+  const cardChecksModel = v.clients * v.freq * v.months;
+  const avgCheck = v.positions * v.price;
+  const revenue = checks * avgCheck;
+  const revFood = revenue * v.shareFood / 100;
+  const revNonFood = revenue * shareNonFood / 100;
+  const revHead = revFood * v.shareHead / 100;
+  const revTail = revFood * shareTail / 100;
+  const marginFoodAvg = (v.marginHead * v.shareHead + v.marginTail * shareTail) / 100;
+  const grossFood = revHead * v.marginHead/100 + revTail * v.marginTail/100;
+  const grossNonFood = revNonFood * v.marginNonFood/100;
+  const gross = grossFood + grossNonFood;
+  const avgMargin = revenue > 0 ? (gross / revenue) * 100 : 0;
+  const net = gross - v.opex;
+  return {checks, cardChecks, cardChecksModel, noCardChecks, avgCheck, revenue, revFood, revNonFood, marginFoodAvg, grossNonFood, avgMargin, gross, opex: v.opex, net};
+}
+
+function updateParamFacts(plans){
+  const meta = {
+    cardSharePct:{kind:'pct'}, checksManual:{kind:'int'},
+    clients:{kind:'int'}, freq:{kind:'dec1'}, months:{kind:'int'},
+    positions:{kind:'dec1'}, price:{kind:'rub'},
+    shareFood:{kind:'pct'}, shareHead:{kind:'pct'},
+    marginHead:{kind:'pct'}, marginTail:{kind:'pct'}, marginNonFood:{kind:'pct'},
+    opex:{kind:'rub'}
+  };
+  const vals = {};
+  let any = false;
+  Object.keys(meta).forEach(key => {
+    const planVal = plans[key];
+    const factInput = document.querySelector('.tbl-fact[data-src="' + key + '"]');
+    const devCell = document.getElementById('dev_' + key);
+    const raw = factInput.value;
+    if(raw === '' || isNaN(parseFloat(raw))){
+      vals[key] = planVal;
+      devCell.textContent = '—';
+      return;
+    }
+    const fact = parseFloat(raw);
+    vals[key] = fact;
+    any = true;
+    const diff = planVal - fact;
+    const kind = meta[key].kind;
+    let diffStr;
+    if(kind === 'pct') diffStr = fmtPP(diff);
+    else if(kind === 'rub') diffStr = (diff >= 0 ? '+' : '– ') + fmtRub(Math.abs(diff));
+    else if(kind === 'dec1') diffStr = (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.',',');
+    else diffStr = (diff >= 0 ? '+' : '') + Math.round(diff).toLocaleString('ru-RU');
+    const base = fact !== 0 ? fact : planVal;
+    const pctStr = base !== 0 ? ' (' + (diff/base*100 >= 0 ? '+' : '') + (diff/base*100).toFixed(1).replace('.',',') + '%)' : '';
+    devCell.textContent = diffStr + pctStr;
+  });
+  return {vals, any};
+}
+
+function fillRefRow(prefix, key, planV, factV, anyFact, fmt, isPP, invert){
+  document.getElementById(prefix + key + '_plan').textContent = fmt(planV);
+  const factCell = document.getElementById(prefix + key + '_fact');
+  const devCell = document.getElementById(prefix + key + '_dev');
+  if(!anyFact){
+    factCell.textContent = '—';
+    devCell.textContent = '—';
+    devCell.className = devCell.className.replace(/good|bad/g,'').trim();
+    return;
+  }
+  factCell.textContent = fmt(factV);
+  const diff = planV - factV;
+  const good = invert ? diff >= 0 : diff <= 0;
+  devCell.className = devCell.className.replace(/good|bad/g,'').trim() + ' ' + (good ? 'good' : 'bad');
+  const diffStr = isPP ? fmtPP(diff) : (diff >= 0 ? '+' : '– ') + fmt(Math.abs(diff)).replace(/^[+–]\s*/, '');
+  const base = factV !== 0 ? factV : planV;
+  const pctStr = base !== 0 ? ' (' + (diff/base*100 >= 0 ? '+' : '') + (diff/base*100).toFixed(1).replace('.',',') + '%)' : '';
+  devCell.textContent = diffStr + pctStr;
+}
+
+function updatePF(rows){
+  Object.keys(rows).forEach(key => {
+    const {plan, fmt, isPP, invert} = rows[key];
+    const planCell = document.getElementById('pf_' + key + '_plan');
+    const factInput = document.getElementById('pf_' + key + '_fact');
+    const devCell = document.getElementById('pf_' + key + '_dev');
+    planCell.textContent = fmt(plan);
+
+    const raw = factInput.value;
+    if(raw === ''){
+      devCell.textContent = '—';
+      devCell.className = 'num';
+      return;
+    }
+    const fact = parseFloat(raw);
+    if(isNaN(fact)){
+      devCell.textContent = '—';
+      devCell.className = 'num';
+      return;
+    }
+    const diff = fact - plan;
+    const good = invert ? diff <= 0 : diff >= 0;
+    devCell.className = 'num ' + (good ? 'good' : 'bad');
+    const diffStr = isPP ? fmtPP(diff) : (diff >= 0 ? '+' : '– ') + fmt(Math.abs(diff)).replace(/^[+–]\s*/, '');
+    const pctStr = (!isPP && plan !== 0) ? ' (' + (diff/plan*100 >= 0 ? '+' : '') + (diff/plan*100).toFixed(1).replace('.',',') + '%)' : '';
+    devCell.textContent = diffStr + pctStr;
+  });
+}
+
+link('cardSharePct_r','cardSharePct',1,100,recalc);
+link('checksManual_r','checksManual',1000,5000000,recalc);
+document.querySelectorAll('input[name="checksSource"]').forEach(r => r.addEventListener('change', recalc));
+document.querySelectorAll('input[name="checksSourceTbl"]').forEach(r => r.addEventListener('change', () => {
+  const val = document.querySelector('input[name="checksSourceTbl"]:checked').value;
+  document.getElementById(val === 'manual' ? 'checksSourceManual' : 'checksSourceClients').checked = true;
+  recalc();
+}));
+link('clients_r','clients',200,1000000,recalc);
+link('freq_r','freq',0.1,10,recalc);
+link('months_r','months',1,24,recalc);
+link('positions_r','positions',1,8,recalc);
+link('price_r','price',100,1500,recalc);
+link('marginHead_r','marginHead',-5,50,recalc);
+link('marginTail_r','marginTail',-5,60,recalc);
+link('marginNonFood_r','marginNonFood',0,70,recalc);
+link('shareFood_r','shareFood',0,100,recalc);
+link('shareHead_r','shareHead',0,100,recalc);
+link('opex_r','opex',500000,1000000000,recalc);
+
+document.querySelectorAll('.pf-input').forEach(el => el.addEventListener('input', recalc));
+
+function switchTab(tab){
+  const sliders = document.getElementById('view-sliders');
+  const table = document.getElementById('view-table');
+  const btnSliders = document.getElementById('tabBtnSliders');
+  const btnTable = document.getElementById('tabBtnTable');
+  const summaryPanel = document.getElementById('summaryPanel');
+  const outerPf = document.getElementById('outerPfBlock');
+  const grid = document.querySelector('.grid');
+  if(tab === 'table'){
+    sliders.style.display = 'none';
+    table.style.display = '';
+    btnTable.classList.add('active');
+    btnSliders.classList.remove('active');
+    summaryPanel.style.display = 'none';
+    outerPf.style.display = 'none';
+    grid.style.gridTemplateColumns = '1fr';
+  } else {
+    sliders.style.display = '';
+    table.style.display = 'none';
+    btnSliders.classList.add('active');
+    btnTable.classList.remove('active');
+    summaryPanel.style.display = '';
+    outerPf.style.display = '';
+    grid.style.gridTemplateColumns = '';
+  }
+}
+
+document.querySelectorAll('.tbl-input').forEach(el => {
+  const srcId = el.dataset.src;
+  const src = document.getElementById(srcId);
+  el.value = src.value;
+  el.addEventListener('input', () => {
+    src.value = el.value;
+    recalc();
+  });
+});
+
+document.querySelectorAll('.tbl-fact').forEach(el => el.addEventListener('input', recalc));
+
+const DEFAULTS = {
+  months: 8,
+  cardSharePct: 64.8,
+  checksManual: 1777778,
+  clients: 240000,
+  freq: 0.6,
+  positions: 3.61,
+  price: 287.5,
+  shareFood: 56,
+  shareHead: 55,
+  marginHead: 27.8,
+  marginTail: 39,
+  marginNonFood: 41.7,
+  opex: 773000000
+};
+
+// Неявная себестоимость (цена − маржа), от которой маржа пересчитывается при изменении цены.
+// Фиксируется в момент, когда маржу задают напрямую; при изменении цены остаётся неизменной.
+let costState = {
+  head: DEFAULTS.price * (1 - DEFAULTS.marginHead / 100),
+  tail: DEFAULTS.price * (1 - DEFAULTS.marginTail / 100),
+  nonFood: DEFAULTS.price * (1 - DEFAULTS.marginNonFood / 100)
+};
+let lastPriceForMargin = DEFAULTS.price;
+
+function resetToDefaults(){
+  Object.keys(DEFAULTS).forEach(key => {
+    const val = DEFAULTS[key];
+    const src = document.getElementById(key);
+    if(src) src.value = val;
+    const range = document.getElementById(key + '_r');
+    if(range) range.value = val;
+    const fact = document.querySelector('.tbl-fact[data-src="' + key + '"]');
+    if(fact) fact.value = val;
+  });
+  costState = {
+    head: DEFAULTS.price * (1 - DEFAULTS.marginHead / 100),
+    tail: DEFAULTS.price * (1 - DEFAULTS.marginTail / 100),
+    nonFood: DEFAULTS.price * (1 - DEFAULTS.marginNonFood / 100)
+  };
+  lastPriceForMargin = DEFAULTS.price;
+  document.getElementById('checksSourceManual').checked = true;
+  document.getElementById('checksSourceManualTbl').checked = true;
+  recalc();
+}
+
+recalc();
+</script>
+</body>
+</html>
