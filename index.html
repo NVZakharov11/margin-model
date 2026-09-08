@@ -400,7 +400,7 @@
 
         <div class="row" id="checksManualRow">
           <label for="checksManual"><strong>Итого чеков за период</strong></label>
-          <div class="valwrap"><input type="number" id="checksManual" value="1777778" step="1000"><span class="unit">шт</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="checksManual" value="1 777 778" step="1000"><span class="unit">шт</span></div>
         </div>
         <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1777778"></div>
 
@@ -415,7 +415,7 @@
 
         <div class="row" id="clientsRow" style="border-top:1px dashed var(--line);padding-top:.7rem;">
           <label for="clients"><strong>Клиенты с картой</strong> — количество</label>
-          <div class="valwrap"><input type="number" id="clients" value="240000" step="1000"><span class="unit">чел</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="clients" value="240 000" step="1000"><span class="unit">чел</span></div>
         </div>
         <div class="sliderline" id="clientsSlider"><input type="range" id="clients_r" min="200" max="1000000" step="1000" value="240000"></div>
 
@@ -524,7 +524,7 @@
         <p class="hint">Постоянные расходы за тот же период (аренда, ФОТ, логистика и т.д.).</p>
         <div class="row">
           <label for="opex">Операционные расходы</label>
-          <div class="valwrap"><input type="number" id="opex" value="773000000" step="1000000"><span class="unit">₽</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="opex" value="773 000 000" step="1000000"><span class="unit">₽</span></div>
         </div>
         <div class="sliderline"><input type="range" id="opex_r" min="500000" max="1000000000" step="1000000" value="773000000"></div>
       </section>
@@ -557,7 +557,7 @@
                 </div>
               </td></tr>
               <tr><td>Доля чеков по карте</td><td><input type="number" class="tbl-input" data-src="cardSharePct" value="64.8" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="cardSharePct" value="64.8" step="0.1" readonly></td><td class="num" id="dev_cardSharePct">—</td><td class="unit">%</td></tr>
-              <tr><td>Итого чеков за период</td><td><input type="number" class="tbl-input" data-src="checksManual" value="1777778" step="1000"></td><td><input type="number" class="tbl-fact" data-src="checksManual" value="1777778" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
+              <tr><td>Итого чеков за период</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="checksManual" value="1 777 778" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="checksManual" value="1 777 778" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ чеков по карте (итого × доля)</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecks_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_cardChecks_fact">—</span></div>
@@ -569,7 +569,7 @@
                 <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_noCardChecks_dev">—</span></div>
               </div></div></td></tr>
 
-              <tr><td>Клиенты с картой — количество <span style="opacity:.6;">(справочно)</span></td><td><input type="number" class="tbl-input" data-src="clients" value="240000" step="1000"></td><td><input type="number" class="tbl-fact" data-src="clients" value="240000" step="1000" readonly></td><td class="num" id="dev_clients">—</td><td class="unit">чел</td></tr>
+              <tr><td>Клиенты с картой — количество <span style="opacity:.6;">(справочно)</span></td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="clients" value="240 000" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="clients" value="240 000" step="1000" readonly></td><td class="num" id="dev_clients">—</td><td class="unit">чел</td></tr>
               <tr><td>Покупок в месяц на клиента с картой <span style="opacity:.6;">(справочно)</span></td><td><input type="number" class="tbl-input" data-src="freq" value="0.6" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="freq" value="0.6" step="0.1" readonly></td><td class="num" id="dev_freq">—</td><td class="unit">шт</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box" style="background:transparent;border:1px dashed var(--line-strong);"><div class="ref-label">→ справочно: чеков по карте по модели клиентов</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecksModel_plan">—</span></div>
@@ -618,7 +618,7 @@
               </div></div></td></tr>
 
               <tr class="group-row"><td colspan="5">Операционные расходы</td></tr>
-              <tr><td>Операционные расходы</td><td><input type="number" class="tbl-input" data-src="opex" value="773000000" step="1000000"></td><td><input type="number" class="tbl-fact" data-src="opex" value="773000000" step="1000000" readonly></td><td class="num" id="dev_opex">—</td><td class="unit">₽</td></tr>
+              <tr><td>Операционные расходы</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="opex" value="773 000 000" step="1000000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opex" value="773 000 000" step="1000000" readonly></td><td class="num" id="dev_opex">—</td><td class="unit">₽</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box" id="tblref_netBox"><div class="ref-label">→ чистая прибыль за период (итог модели)</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_net_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_net_fact">—</span></div>
@@ -753,14 +753,32 @@ function fmtPP(n){
   return sign + n.toFixed(1).replace('.', ',') + ' п.п.';
 }
 
+// Форматирование больших чисел с пробелами-разделителями (например, «1 777 778»)
+// и обратный парсинг из такой строки в чистое число для расчётов.
+function formatBigNum(n){
+  if(isNaN(n)) return '';
+  return Math.round(n).toLocaleString('ru-RU');
+}
+function parseBigNum(str){
+  const cleaned = String(str).replace(/[^\d.\-]/g, '');
+  const v = parseFloat(cleaned);
+  return isNaN(v) ? 0 : v;
+}
+function reformatBigNumFields(){
+  document.querySelectorAll('.fmt-bignum').forEach(el => {
+    if(document.activeElement === el) return;
+    el.value = formatBigNum(parseBigNum(el.value));
+  });
+}
+
 function link(rangeId, numberId, min, max, cb){
   const r = document.getElementById(rangeId);
   const n = document.getElementById(numberId);
   function clamp(v){ return Math.min(max, Math.max(min, v)); }
   r.addEventListener('input', () => { n.value = r.value; cb(); });
   n.addEventListener('input', () => {
-    let v = parseFloat(n.value);
-    if(isNaN(v)) return;
+    let v = parseBigNum(n.value);
+    if(n.value.trim() === '') return;
     v = clamp(v);
     r.value = v;
     cb();
@@ -817,7 +835,7 @@ function updateChecksSourceUI(mode){
 }
 
 function recalc(){
-  const clients = parseFloat(document.getElementById('clients').value) || 0;
+  const clients = parseBigNum(document.getElementById('clients').value);
   const freq = parseFloat(document.getElementById('freq').value) || 0;
   const months = parseFloat(document.getElementById('months').value) || 0;
   const cardSharePct = parseFloat(document.getElementById('cardSharePct').value) || 0;
@@ -826,12 +844,12 @@ function recalc(){
 
   let checks, cardChecks;
   if (checksSource === 'manual') {
-    checks = parseFloat(document.getElementById('checksManual').value) || 0;
+    checks = parseBigNum(document.getElementById('checksManual').value);
     cardChecks = checks * (cardSharePct / 100);
   } else {
     cardChecks = cardChecksModel;
     checks = cardSharePct > 0 ? cardChecks / (cardSharePct / 100) : cardChecks;
-    document.getElementById('checksManual').value = Math.round(checks);
+    document.getElementById('checksManual').value = formatBigNum(checks);
     document.getElementById('checksManual_r').value = checks;
   }
   const noCardChecks = checks - cardChecks;
@@ -865,7 +883,7 @@ function recalc(){
   }
   lastPriceForMargin = price;
 
-  const opex = parseFloat(document.getElementById('opex').value) || 0;
+  const opex = parseBigNum(document.getElementById('opex').value);
 
   const shareNonFood = 100 - shareFood;
   const shareTail = 100 - shareHead;
@@ -986,6 +1004,8 @@ function recalc(){
   fillRefRow('tblref_', 'grossNonFood', grossNonFood, factScenario.grossNonFood, anyFact, fmtRub);
   fillRefRow('tblref_', 'net', net, factScenario.net, anyFact, fmtRub);
   document.getElementById('tblref_netBox').style.background = net >= 0 ? 'var(--positive-bg)' : 'var(--negative-bg)';
+
+  reformatBigNumFields();
 }
 
 function computeScenario(v){
@@ -1026,12 +1046,12 @@ function updateParamFacts(plans){
     const factInput = document.querySelector('.tbl-fact[data-src="' + key + '"]');
     const devCell = document.getElementById('dev_' + key);
     const raw = factInput.value;
-    if(raw === '' || isNaN(parseFloat(raw))){
+    if(raw === '' || isNaN(parseBigNum(raw))){
       vals[key] = planVal;
       devCell.textContent = '—';
       return;
     }
-    const fact = parseFloat(raw);
+    const fact = parseBigNum(raw);
     vals[key] = fact;
     any = true;
     const diff = planVal - fact;
