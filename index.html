@@ -415,9 +415,9 @@
 
         <div class="row" id="clientsRow" style="border-top:1px dashed var(--line);padding-top:.7rem;">
           <label for="clients"><strong>Клиенты с картой</strong> — количество</label>
-          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="clients" value="240 000" step="1000"><span class="unit">чел</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="clients" value="213 326" step="1000"><span class="unit">чел</span></div>
         </div>
-        <div class="sliderline" id="clientsSlider"><input type="range" id="clients_r" min="200" max="1000000" step="1000" value="240000"></div>
+        <div class="sliderline" id="clientsSlider"><input type="range" id="clients_r" min="200" max="1000000" step="1000" value="213326"></div>
 
         <div class="row" id="freqRow">
           <label for="freq">Покупок в месяц на клиента с картой</label>
@@ -572,7 +572,7 @@
                 <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_noCardChecks_dev">—</span></div>
               </div></div></td></tr>
 
-              <tr><td>Клиенты с картой — количество <span style="opacity:.6;">(справочно)</span></td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="clients" value="240 000" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="clients" value="240 000" step="1000" readonly></td><td class="num" id="dev_clients">—</td><td class="unit">чел</td></tr>
+              <tr><td>Клиенты с картой — количество <span style="opacity:.6;">(справочно)</span></td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="clients" value="213 326" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="clients" value="213 326" step="1000" readonly></td><td class="num" id="dev_clients">—</td><td class="unit">чел</td></tr>
               <tr><td>Покупок в месяц на клиента с картой <span style="opacity:.6;">(справочно)</span></td><td><input type="number" class="tbl-input" data-src="freq" value="0.6" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="freq" value="0.6" step="0.1" readonly></td><td class="num" id="dev_freq">—</td><td class="unit">шт</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box" style="background:transparent;border:1px dashed var(--line-strong);"><div class="ref-label">→ справочно: чеков по карте по модели клиентов</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecksModel_plan">—</span></div>
@@ -1224,7 +1224,7 @@ const DEFAULTS = {
   months: 8,
   cardSharePct: 64.8,
   checksManual: 1580196,
-  clients: 240000,
+  clients: 213326,
   freq: 0.6,
   positions: 3.63,
   price: 284,
