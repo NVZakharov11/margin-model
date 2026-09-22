@@ -400,9 +400,9 @@
 
         <div class="row" id="checksManualRow">
           <label for="checksManual"><strong>Итого чеков за период</strong></label>
-          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="checksManual" value="1 777 778" step="1000"><span class="unit">шт</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="checksManual" value="1 580 196" step="1000"><span class="unit">шт</span></div>
         </div>
-        <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1777778"></div>
+        <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1580196"></div>
 
         <div class="derived">
           <span class="k">Чеков по карте</span>
@@ -437,15 +437,15 @@
 
         <div class="row">
           <label for="positions">Шт в чеке</label>
-          <div class="valwrap"><input type="number" id="positions" value="3.61" step="0.01"><span class="unit">шт</span></div>
+          <div class="valwrap"><input type="number" id="positions" value="3.63" step="0.01"><span class="unit">шт</span></div>
         </div>
-        <div class="sliderline"><input type="range" id="positions_r" min="1" max="8" step="0.01" value="3.61"></div>
+        <div class="sliderline"><input type="range" id="positions_r" min="1" max="8" step="0.01" value="3.63"></div>
 
         <div class="row">
           <label for="price">Средняя цена позиции</label>
-          <div class="valwrap"><input type="number" id="price" value="287.5" step="1"><span class="unit">₽</span></div>
+          <div class="valwrap"><input type="number" id="price" value="284" step="1"><span class="unit">₽</span></div>
         </div>
-        <div class="sliderline"><input type="range" id="price_r" min="100" max="1500" step="1" value="287.5"></div>
+        <div class="sliderline"><input type="range" id="price_r" min="100" max="1500" step="1" value="284"></div>
 
         <div class="derived">
           <span class="k">Средний чек</span>
@@ -521,12 +521,15 @@
 
       <section class="block">
         <h2>Операционные расходы</h2>
-        <p class="hint">Постоянные расходы за тот же период (аренда, ФОТ, логистика и т.д.).</p>
-        <div class="row">
-          <label for="opex">Операционные расходы</label>
-          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="opex" value="773 000 000" step="1000000"><span class="unit">₽</span></div>
+        <p class="hint">Детализация по статьям расходов — на вкладке «Таблица параметров» (там и редактируется). Здесь — расчётный итог.</p>
+        <div class="derived">
+          <span class="k">Операционные расходы (план, сумма статей)</span>
+          <span class="v" id="opexPlanOut">—</span>
         </div>
-        <div class="sliderline"><input type="range" id="opex_r" min="500000" max="1000000000" step="1000000" value="773000000"></div>
+        <div class="derived copper">
+          <span class="k">Операционные расходы (факт, сумма статей)</span>
+          <span class="v" id="opexFactOut">—</span>
+        </div>
       </section>
 
       </div>
@@ -557,7 +560,7 @@
                 </div>
               </td></tr>
               <tr><td>Доля чеков по карте</td><td><input type="number" class="tbl-input" data-src="cardSharePct" value="64.8" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="cardSharePct" value="64.8" step="0.1" readonly></td><td class="num" id="dev_cardSharePct">—</td><td class="unit">%</td></tr>
-              <tr><td>Итого чеков за период</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="checksManual" value="1 777 778" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="checksManual" value="1 777 778" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
+              <tr><td>Итого чеков за период</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="checksManual" value="1 580 196" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="checksManual" value="1 580 196" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ чеков по карте (итого × доля)</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecks_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_cardChecks_fact">—</span></div>
@@ -578,8 +581,8 @@
               </div></div></td></tr>
 
               <tr class="group-row"><td colspan="5">Чек</td></tr>
-              <tr><td>Шт в чеке</td><td><input type="number" class="tbl-input" data-src="positions" value="3.61" step="0.01"></td><td><input type="number" class="tbl-fact" data-src="positions" value="3.61" step="0.01" readonly></td><td class="num" id="dev_positions">—</td><td class="unit">шт</td></tr>
-              <tr><td>Средняя цена позиции</td><td><input type="number" class="tbl-input" data-src="price" value="287.5" step="1"></td><td><input type="number" class="tbl-fact" data-src="price" value="287.5" step="1" readonly></td><td class="num" id="dev_price">—</td><td class="unit">₽</td></tr>
+              <tr><td>Шт в чеке</td><td><input type="number" class="tbl-input" data-src="positions" value="3.63" step="0.01"></td><td><input type="number" class="tbl-fact" data-src="positions" value="3.63" step="0.01" readonly></td><td class="num" id="dev_positions">—</td><td class="unit">шт</td></tr>
+              <tr><td>Средняя цена позиции</td><td><input type="number" class="tbl-input" data-src="price" value="284" step="1"></td><td><input type="number" class="tbl-fact" data-src="price" value="284" step="1" readonly></td><td class="num" id="dev_price">—</td><td class="unit">₽</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ средний чек</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_avgCheck_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_avgCheck_fact">—</span></div>
@@ -617,8 +620,26 @@
                 <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_grossNonFood_dev">—</span></div>
               </div></div></td></tr>
 
-              <tr class="group-row"><td colspan="5">Операционные расходы</td></tr>
-              <tr><td>Операционные расходы</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="opex" value="773 000 000" step="1000000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opex" value="773 000 000" step="1000000" readonly></td><td class="num" id="dev_opex">—</td><td class="unit">₽</td></tr>
+              <tr class="group-row"><td colspan="5">Операционные расходы — по статьям (данные за 8 мес.)</td></tr>
+              <tr><td>Товарные расходы и потери</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexGoods" value="12 083 972" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexGoods" value="12 083 972" step="10000" readonly></td><td class="num" id="dev_opexGoods">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы, связанные с реализацией товара</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexRealization" value="1 210 253" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexRealization" value="1 210 253" step="10000" readonly></td><td class="num" id="dev_opexRealization">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы на ФОТ</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexPayroll" value="207 241 837" step="100000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexPayroll" value="207 241 837" step="100000" readonly></td><td class="num" id="dev_opexPayroll">—</td><td class="unit">₽</td></tr>
+              <tr><td>Прочие расходы на содержание персонала</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexPersonnelOther" value="478 839" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexPersonnelOther" value="478 839" step="10000" readonly></td><td class="num" id="dev_opexPersonnelOther">—</td><td class="unit">₽</td></tr>
+              <tr><td>Аренда и коммунальные платежи</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexRent" value="150 857 535" step="100000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexRent" value="150 857 535" step="100000" readonly></td><td class="num" id="dev_opexRent">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы на организацию работы площадей</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexPremises" value="23 416 213" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexPremises" value="23 416 213" step="10000" readonly></td><td class="num" id="dev_opexPremises">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы на содержание оборудования</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexEquipment" value="3 797 262" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexEquipment" value="3 797 262" step="10000" readonly></td><td class="num" id="dev_opexEquipment">—</td><td class="unit">₽</td></tr>
+              <tr><td>Общие административные расходы (вкл. эквайринг)</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexAdmin" value="38 429 386" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexAdmin" value="38 429 386" step="10000" readonly></td><td class="num" id="dev_opexAdmin">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы на рекламу и продвижение товара</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexAds" value="3 176 681" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexAds" value="3 176 681" step="10000" readonly></td><td class="num" id="dev_opexAds">—</td><td class="unit">₽</td></tr>
+              <tr><td>Логистика (транспорт + склад)</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexLogistics" value="13 834 900" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexLogistics" value="13 834 900" step="10000" readonly></td><td class="num" id="dev_opexLogistics">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы офиса</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexOffice" value="75 176 284" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexOffice" value="75 176 284" step="10000" readonly></td><td class="num" id="dev_opexOffice">—</td><td class="unit">₽</td></tr>
+              <tr><td>Расходы УК (Сорокс + АйТиБио)</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="opexMgmtCo" value="26 974 540" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="opexMgmtCo" value="26 974 540" step="10000" readonly></td><td class="num" id="dev_opexMgmtCo">—</td><td class="unit">₽</td></tr>
+              <tr><td>Проценты по кредитам</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="interestExpense" value="62 810 305" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="interestExpense" value="62 810 305" step="10000" readonly></td><td class="num" id="dev_interestExpense">—</td><td class="unit">₽</td></tr>
+              <tr><td>Прочие налоги</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" id="otherTaxes" value="59 366 271" step="10000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="otherTaxes" value="59 366 271" step="10000" readonly></td><td class="num" id="dev_otherTaxes">—</td><td class="unit">₽</td></tr>
+              <tr class="ref-row"><td colspan="5"><div class="ref-box copper"><div class="ref-label">→ ОРЕХ итого (сумма статей, вкл. проценты и налоги)</div><div class="ref-vals">
+                <div><span class="ref-tag">План</span><span class="v" id="tblref_opexTotal_plan">—</span></div>
+                <div><span class="ref-tag">Факт</span><span class="v" id="tblref_opexTotal_fact">—</span></div>
+                <div><span class="ref-tag">Откл.</span><span class="v num" id="tblref_opexTotal_dev">—</span></div>
+              </div></div></td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box" id="tblref_netBox"><div class="ref-label">→ чистая прибыль за период (итог модели)</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_net_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_net_fact">—</span></div>
@@ -883,7 +904,14 @@ function recalc(){
   }
   lastPriceForMargin = price;
 
-  const opex = parseBigNum(document.getElementById('opex').value);
+  const OPEX_KEYS = ['opexGoods','opexRealization','opexPayroll','opexPersonnelOther','opexRent','opexPremises','opexEquipment','opexAdmin','opexAds','opexLogistics','opexOffice','opexMgmtCo','interestExpense','otherTaxes'];
+  const opexPlanByItem = {};
+  let opex = 0;
+  OPEX_KEYS.forEach(k => {
+    const v = parseBigNum(document.getElementById(k).value);
+    opexPlanByItem[k] = v;
+    opex += v;
+  });
 
   const shareNonFood = 100 - shareFood;
   const shareTail = 100 - shareHead;
@@ -954,7 +982,7 @@ function recalc(){
   const verdict = document.getElementById('verdict');
   if(net >= 0){
     verdict.className = 'verdict positive';
-    verdict.textContent = 'Маржа перекрывает операционные расходы: запас ' + fmtPP(gapPP) + ' сверх точки безубыточности, чистая прибыль ' + fmtRub(net) + '.';
+    verdict.textContent = 'Маржа перекрывает все расходы (ОРЕХ, проценты, налоги и т.д.): запас ' + fmtPP(gapPP) + ' сверх точки безубыточности, чистая прибыль ' + fmtRub(net) + '.';
   } else {
     verdict.className = 'verdict negative';
     verdict.textContent = 'Маржи не хватает на ' + fmtPP(Math.abs(gapPP)).replace('+','') + ' до точки безубыточности, убыток ' + fmtRub(Math.abs(net)) + '.';
@@ -976,11 +1004,18 @@ function recalc(){
     if(src) el.value = src.value;
   });
 
-  const planVals = {cardSharePct,checksManual:checks,clients,freq,months,positions,price,shareFood,shareHead,marginHead,marginTail,marginNonFood,opex};
+  const planVals = Object.assign({cardSharePct,checksManual:checks,clients,freq,months,positions,price,shareFood,shareHead,marginHead,marginTail,marginNonFood}, opexPlanByItem);
   const factResult = updateParamFacts(planVals);
   const factVals = factResult.vals;
   const anyFact = factResult.any;
+  let factOpexTotal = 0;
+  OPEX_KEYS.forEach(k => factOpexTotal += factVals[k]);
+  factVals.opex = factOpexTotal;
   const factScenario = computeScenario(factVals);
+
+  document.getElementById('opexPlanOut').textContent = fmtRub(opex);
+  document.getElementById('opexFactOut').textContent = fmtRub(factOpexTotal);
+  fillRefRow('tblref_', 'opexTotal', opex, factOpexTotal, anyFact, fmtRub, false, true);
 
   fillRefRow('res_', 'checks', checks, factScenario.checks, anyFact, v => Math.round(v).toLocaleString('ru-RU') + ' шт');
   fillRefRow('res_', 'avgCheck', avgCheck, factScenario.avgCheck, anyFact, fmtRub);
@@ -1037,7 +1072,11 @@ function updateParamFacts(plans){
     positions:{kind:'dec1'}, price:{kind:'rub'},
     shareFood:{kind:'pct'}, shareHead:{kind:'pct'},
     marginHead:{kind:'pct'}, marginTail:{kind:'pct'}, marginNonFood:{kind:'pct'},
-    opex:{kind:'rub'}
+    opexGoods:{kind:'rub'}, opexRealization:{kind:'rub'}, opexPayroll:{kind:'rub'},
+    opexPersonnelOther:{kind:'rub'}, opexRent:{kind:'rub'}, opexPremises:{kind:'rub'},
+    opexEquipment:{kind:'rub'}, opexAdmin:{kind:'rub'}, opexAds:{kind:'rub'},
+    opexLogistics:{kind:'rub'}, opexOffice:{kind:'rub'},
+    opexMgmtCo:{kind:'rub'}, interestExpense:{kind:'rub'}, otherTaxes:{kind:'rub'}
   };
   const vals = {};
   let any = false;
@@ -1135,7 +1174,6 @@ link('marginTail_r','marginTail',-5,60,recalc);
 link('marginNonFood_r','marginNonFood',0,70,recalc);
 link('shareFood_r','shareFood',0,100,recalc);
 link('shareHead_r','shareHead',0,100,recalc);
-link('opex_r','opex',500000,1000000000,recalc);
 
 document.querySelectorAll('.pf-input').forEach(el => el.addEventListener('input', recalc));
 
@@ -1168,6 +1206,10 @@ function switchTab(tab){
 
 document.querySelectorAll('.tbl-input').forEach(el => {
   const srcId = el.dataset.src;
+  if(!srcId){
+    el.addEventListener('input', recalc);
+    return;
+  }
   const src = document.getElementById(srcId);
   el.value = src.value;
   el.addEventListener('input', () => {
@@ -1181,17 +1223,30 @@ document.querySelectorAll('.tbl-fact').forEach(el => el.addEventListener('input'
 const DEFAULTS = {
   months: 8,
   cardSharePct: 64.8,
-  checksManual: 1777778,
+  checksManual: 1580196,
   clients: 240000,
   freq: 0.6,
-  positions: 3.61,
-  price: 287.5,
+  positions: 3.63,
+  price: 284,
   shareFood: 56,
   shareHead: 55,
   marginHead: 27.8,
   marginTail: 39,
   marginNonFood: 41.7,
-  opex: 773000000
+  opexGoods: 12083972,
+  opexRealization: 1210253,
+  opexPayroll: 207241837,
+  opexPersonnelOther: 478839,
+  opexRent: 150857535,
+  opexPremises: 23416213,
+  opexEquipment: 3797262,
+  opexAdmin: 38429386,
+  opexAds: 3176681,
+  opexLogistics: 13834900,
+  opexOffice: 75176284,
+  opexMgmtCo: 26974540,
+  interestExpense: 62810305,
+  otherTaxes: 59366271
 };
 
 // Неявная себестоимость (цена − маржа), от которой маржа пересчитывается при изменении цены.
