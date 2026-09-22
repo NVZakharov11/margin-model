@@ -400,9 +400,9 @@
 
         <div class="row" id="checksManualRow">
           <label for="checksManual"><strong>Итого чеков за период</strong></label>
-          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="checksManual" value="1 580 196" step="1000"><span class="unit">шт</span></div>
+          <div class="valwrap"><input type="text" inputmode="numeric" class="fmt-bignum" id="checksManual" value="1 580 193" step="1000"><span class="unit">шт</span></div>
         </div>
-        <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1580196"></div>
+        <div class="sliderline" id="checksManualSlider"><input type="range" id="checksManual_r" min="1000" max="5000000" step="1000" value="1580193"></div>
 
         <div class="derived">
           <span class="k">Чеков по карте</span>
@@ -560,7 +560,7 @@
                 </div>
               </td></tr>
               <tr><td>Доля чеков по карте</td><td><input type="number" class="tbl-input" data-src="cardSharePct" value="64.8" step="0.1"></td><td><input type="number" class="tbl-fact" data-src="cardSharePct" value="64.8" step="0.1" readonly></td><td class="num" id="dev_cardSharePct">—</td><td class="unit">%</td></tr>
-              <tr><td>Итого чеков за период</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="checksManual" value="1 580 196" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="checksManual" value="1 580 196" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
+              <tr><td>Итого чеков за период</td><td><input type="text" inputmode="numeric" class="tbl-input fmt-bignum" data-src="checksManual" value="1 580 193" step="1000"></td><td><input type="text" inputmode="numeric" class="tbl-fact fmt-bignum" data-src="checksManual" value="1 580 193" step="1000" readonly></td><td class="num" id="dev_checksManual">—</td><td class="unit">шт</td></tr>
               <tr class="ref-row"><td colspan="5"><div class="ref-box"><div class="ref-label">→ чеков по карте (итого × доля)</div><div class="ref-vals">
                 <div><span class="ref-tag">План</span><span class="v" id="tblref_cardChecks_plan">—</span></div>
                 <div><span class="ref-tag">Факт</span><span class="v" id="tblref_cardChecks_fact">—</span></div>
@@ -870,9 +870,11 @@ function recalc(){
   } else {
     cardChecks = cardChecksModel;
     checks = cardSharePct > 0 ? cardChecks / (cardSharePct / 100) : cardChecks;
+    checks = Math.round(checks); // чек не бывает дробным
     document.getElementById('checksManual').value = formatBigNum(checks);
     document.getElementById('checksManual_r').value = checks;
   }
+  checks = Math.round(checks);
   const noCardChecks = checks - cardChecks;
   updateChecksSourceUI(checksSource);
 
@@ -1223,7 +1225,7 @@ document.querySelectorAll('.tbl-fact').forEach(el => el.addEventListener('input'
 const DEFAULTS = {
   months: 8,
   cardSharePct: 64.8,
-  checksManual: 1580196,
+  checksManual: 1580193,
   clients: 213326,
   freq: 0.6,
   positions: 3.63,
