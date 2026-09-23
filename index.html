@@ -937,7 +937,7 @@ function recalc(){
   const avgMargin = revenue > 0 ? (gross / revenue) * 100 : 0;
 
   const POINTS = 86;
-  const OPEX_KEYS = ['opexGoods','opexRealization','opexPayroll','opexPersonnelOther','opexRent','opexPremises','opexEquipment','opexAdminOnly','opexAcquiring','opexAds','opexLogistics','opexOffice','opexMgmtCo','interestExpense','otherTaxes'];
+  const OPEX_KEYS = ['opexPayroll','opexRent','opexOffice','interestExpense','otherTaxes','opexAcquiring','opexMgmtCo','opexPremises','opexGoods','opexWarehouse','opexAdminOnly','opexEquipment','opexTransport','opexAds','opexRealization','opexPersonnelOther'];
   const opexPlanPctByItem = {};
   const opexPlanRubByItem = {};
   let opex = 0;
@@ -1047,7 +1047,9 @@ function recalc(){
     const factPct = factVals[k];
     const planRub = opexPlanRubByItem[k];
     const factRub = factScenario.opexRubByItem[k];
-    fillOpexItemCard(k, planPct, factPct, planRub, factRub, months, factMonths, POINTS, anyFact);
+    const ppmoDivisor = item.ppmoDivisor || months;
+    const ppmoDivisorFact = item.ppmoDivisor || factMonths;
+    fillOpexItemCard(k, planPct, factPct, planRub, factRub, ppmoDivisor, ppmoDivisorFact, POINTS, anyFact);
   });
 
   const netPlanPct = revenue > 0 ? (net / revenue) * 100 : 0;
@@ -1105,7 +1107,7 @@ function computeScenario(v){
   const gross = grossFood + grossNonFood;
   const avgMargin = revenue > 0 ? (gross / revenue) * 100 : 0;
 
-  const OPEX_KEYS_LOCAL = ['opexGoods','opexRealization','opexPayroll','opexPersonnelOther','opexRent','opexPremises','opexEquipment','opexAdminOnly','opexAcquiring','opexAds','opexLogistics','opexOffice','opexMgmtCo','interestExpense','otherTaxes'];
+  const OPEX_KEYS_LOCAL = ['opexPayroll','opexRent','opexOffice','interestExpense','otherTaxes','opexAcquiring','opexMgmtCo','opexPremises','opexGoods','opexWarehouse','opexAdminOnly','opexEquipment','opexTransport','opexAds','opexRealization','opexPersonnelOther'];
   const opexRubByItem = {};
   let opex = 0;
   OPEX_KEYS_LOCAL.forEach(k => {
@@ -1128,7 +1130,7 @@ function updateParamFacts(plans){
     opexGoods:{kind:'pct'}, opexRealization:{kind:'pct'}, opexPayroll:{kind:'pct'},
     opexPersonnelOther:{kind:'pct'}, opexRent:{kind:'pct'}, opexPremises:{kind:'pct'},
     opexEquipment:{kind:'pct'}, opexAdminOnly:{kind:'pct'}, opexAcquiring:{kind:'pct'}, opexAds:{kind:'pct'},
-    opexLogistics:{kind:'pct'}, opexOffice:{kind:'pct'},
+    opexTransport:{kind:'pct'}, opexWarehouse:{kind:'pct'}, opexOffice:{kind:'pct'},
     opexMgmtCo:{kind:'pct'}, interestExpense:{kind:'pct'}, otherTaxes:{kind:'pct'}
   };
   const vals = {};
@@ -1266,21 +1268,22 @@ function switchTab(tab){
 }
 
 const OPEX_ITEMS = [
-  {key:'opexGoods', label:'Товарные расходы и потери', pct:0.742},
-  {key:'opexRealization', label:'Расходы, связанные с реализацией товара', pct:0.074},
   {key:'opexPayroll', label:'Расходы на ФОТ', pct:12.722},
-  {key:'opexPersonnelOther', label:'Прочие расходы на содержание персонала', pct:0.029},
   {key:'opexRent', label:'Аренда и коммунальные платежи', pct:9.260},
-  {key:'opexPremises', label:'Расходы на организацию работы площадей', pct:1.437},
-  {key:'opexEquipment', label:'Расходы на содержание оборудования', pct:0.233},
-  {key:'opexAdminOnly', label:'Общие административные расходы', pct:0.312},
-  {key:'opexAcquiring', label:'Эквайринг', pct:2.047},
-  {key:'opexAds', label:'Расходы на рекламу и продвижение товара', pct:0.195},
-  {key:'opexLogistics', label:'Логистика (транспорт + склад)', pct:0.849},
   {key:'opexOffice', label:'Расходы офиса', pct:4.615},
-  {key:'opexMgmtCo', label:'Расходы УК (Сорокс + АйТиБио)', pct:1.656},
   {key:'interestExpense', label:'Проценты по кредитам', pct:3.856},
-  {key:'otherTaxes', label:'Прочие налоги', pct:3.644}
+  {key:'otherTaxes', label:'Прочие налоги', pct:3.644},
+  {key:'opexAcquiring', label:'Эквайринг', pct:2.047},
+  {key:'opexMgmtCo', label:'Расходы УК (Сорокс + АйТиБио)', pct:1.656},
+  {key:'opexPremises', label:'Расходы на организацию работы площадей', pct:1.437},
+  {key:'opexGoods', label:'Товарные расходы и потери', pct:0.742},
+  {key:'opexWarehouse', label:'Услуги склада', pct:0.6428, ppmoDivisor:2},
+  {key:'opexAdminOnly', label:'Общие административные расходы', pct:0.312},
+  {key:'opexEquipment', label:'Расходы на содержание оборудования', pct:0.233},
+  {key:'opexTransport', label:'Транспортные расходы', pct:0.2064, ppmoDivisor:2},
+  {key:'opexAds', label:'Расходы на рекламу и продвижение товара', pct:0.195},
+  {key:'opexRealization', label:'Расходы, связанные с реализацией товара', pct:0.074},
+  {key:'opexPersonnelOther', label:'Прочие расходы на содержание персонала', pct:0.029}
 ];
 
 (function buildOpexItemRows(){
@@ -1353,7 +1356,8 @@ const DEFAULTS = {
   opexAdminOnly: 0.312,
   opexAcquiring: 2.047,
   opexAds: 0.195,
-  opexLogistics: 0.849,
+  opexTransport: 0.2064,
+  opexWarehouse: 0.6428,
   opexOffice: 4.615,
   opexMgmtCo: 1.656,
   interestExpense: 3.856,
